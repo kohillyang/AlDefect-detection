@@ -1,4 +1,5 @@
 #encoding=utf-8
+from __future__ import print_function
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 import json
@@ -25,15 +26,21 @@ if __name__ == '__main__':
                                  })
     json.dump(coco_results,open("tmp.json","wt"))
     cocoEval = COCOeval(cocoGt,cocoGt.loadRes("tmp.json"),"bbox")
-    # for i in range(len())
     cocoEval.params.imgIds  = imgIds
-    cocoEval.evaluate()
-    cocoEval.accumulate()
-    cocoEval.summarize()
-
+    mAP_eachclasses = {}
     for catId in catIds:
         print( u"Evaluate %s"%(catid2catbane[catId]))
         cocoEval.params.catIds = [catId]
         cocoEval.evaluate()
         cocoEval.accumulate()
         cocoEval.summarize()
+        mAP_eachclasses[catid2catbane[catId]] = cocoEval.stats[1]
+    print( u"Evaluate all classes.")
+    cocoEval.params.catIds = catIds
+    cocoEval.evaluate()
+    cocoEval.accumulate()
+    cocoEval.summarize()
+    mAP_eachclasses[u"mAP"] = cocoEval.stats[1]
+    print("************summary***************")
+    for k in mAP_eachclasses.keys():
+        print (k,mAP_eachclasses[k])
