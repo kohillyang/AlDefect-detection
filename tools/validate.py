@@ -3,9 +3,16 @@ from __future__ import print_function
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 import json
+import argparse
 from pprint import pprint
+def parse_args():
+    parser = argparse.ArgumentParser(prog='PROG')
+    parser.add_argument('-l', dest = "label", default=u"../annotations/instances_aluminumval2018.json")
+    parser.add_argument('-p', dest = "predict", default=u"../annotations/format_submit_validation_example.json")
+    return parser.parse_args()
 if __name__ == '__main__':
-    cocoGt = COCO(u"../annotations/instances_aluminumval2018.json")
+    args = parse_args()
+    cocoGt = COCO(args.label)
     #create filename to imgid
     catIds = cocoGt.getCatIds()
     catid2catbane = {entry["id"]:entry["name"] for entry in cocoGt.cats.values()}
@@ -13,7 +20,7 @@ if __name__ == '__main__':
     imgIds = cocoGt.getImgIds()
     imgs = cocoGt.loadImgs(imgIds)
     filename2imgid = {entry["file_name"]:entry["id"] for entry in imgs}
-    submit_validataion = json.load(open(u"../annotations/format_submit_validation_example.json","rt"),encoding="utf-8")["results"]
+    submit_validataion = json.load(open(args.predict,"rt"),encoding="utf-8")["results"]
     coco_results = []
     for onefile in submit_validataion:
         #{"image_id":42,"category_id":18,"bbox":[258.15,41.29,348.26,243.78],"score":0.236}
